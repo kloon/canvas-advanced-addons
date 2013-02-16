@@ -433,11 +433,22 @@ class Canvas_Advanced_Addons {
 
 			$full_foot_widget_bg = $woo_options['woo_full_foot_widget_bg'];
 			$full_foot_bg = $woo_options['woo_full_foot_bg'];
+			$footer_bg = $woo_options['woo_footer_bg'];	
+
+			$output .= '#footer {height:auto;}'. "\n";
 
 			if ( $full_foot_widget_bg )
 				$output .= '#footer-widgets-container {padding:0;background-color:' . $full_foot_widget_bg . '}'. "\n";		
 			if ( $full_foot_bg )
-				$output .= '#footer-container {padding:0;background-color:' . $full_foot_bg . '}'. "\n";	
+				$output .= '#footer-container {padding:0;background-color:' . $full_foot_bg . '}'. "\n";
+			if ( $footer_bg ) :
+				$output .= '#footer {border-top: 1px solid ' .$footer_bg . '}'. "\n";
+			else :
+				$output .= '#footer {border-top: 1px solid ' . $full_foot_bg . '}'. "\n";
+			endif;
+
+
+
 
 		}
 	

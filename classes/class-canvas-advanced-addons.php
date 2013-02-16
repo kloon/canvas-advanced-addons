@@ -193,9 +193,6 @@ class Canvas_Advanced_Addons {
 		 // Open DIV tag.
 		 $html .= '<div id="social-links" class="social-links fr">' . "\n";
 		 
-		 // Add "heading" text.
-		 $html .= '<span class="heading-text">' . __( 'Follow', 'canvas-advanced-addons' ) . '→ </span>';
-		 
 		 $template_directory = get_template_directory_uri();
 		 
 		 $profiles = array(

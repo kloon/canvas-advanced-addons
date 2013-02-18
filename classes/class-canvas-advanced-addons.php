@@ -77,6 +77,12 @@ class Canvas_Advanced_Addons {
 		add_action( 'init', array( &$this, 'magazine_page_content_logic' ) );
 		}
 
+		// WooCommerce Mini Cart Location
+		if ( isset( $woo_options['woo_mini_cart_location'] ) && ( 'top-nav' == $woo_options['woo_mini_cart_location'] ) ) {
+			add_action( 'init', array( &$this, 'remove_mini_cart_main_nav' ) );
+			add_action( 'wp_nav_menu_items', array( &$this, 'move_mini_cart_to_top_nav' ), 10, 2 );
+		}
+
 		// Loads Custom Styling
 		add_action( 'woo_head', array( &$this, 'canvas_custom_styling' ) );
 
@@ -344,6 +350,32 @@ class Canvas_Advanced_Addons {
 	} // End full_width_footer_logic()
 
 	/**
+	 * Remove the mini cart from the main navigation
+	 * @access public
+	 * @since 1.0.1
+	 * @return void
+	 **/
+	public function remove_mini_cart_main_nav() {
+		remove_action( 'woo_nav_inside', 'woo_add_nav_cart_link' );
+	} // End remove_mini_cart_main_nav
+
+	/**
+	 * Move the mini cart to the top navigation
+	 * @access public
+	 * @since 1.0.1
+	 * @param string $items
+	 * @param array $args
+	 * @return string
+	 **/
+	public function move_mini_cart_to_top_nav( $items, $args ) {
+		global $woocommerce;
+		if ( $args->menu_id == 'top-nav' ) {
+			$items .= '</ul><ul class="nav cart fr"><li class="menu-item mini-cart-top-nav"><a class="cart-contents" href="'.esc_url( $woocommerce->cart->get_cart_url() ).'" title="'.esc_attr( 'View your shopping cart', 'woothemes' ).'">'.sprintf( _n('%d item', '%d items', $woocommerce->cart->cart_contents_count, 'woothemes' ), $woocommerce->cart->cart_contents_count ).' - '.$woocommerce->cart->get_cart_total().'</a></li>'; 
+		}
+		return $items;
+	} // End move_mini_cart_to_top_nav
+
+	/**
 	 * Canvas Custom Styling.
 	 * @access public
 	 * @since 1.0.0
@@ -443,12 +475,14 @@ class Canvas_Advanced_Addons {
 			else :
 				$output .= '#footer {border-top: 1px solid ' . $full_foot_bg . '}'. "\n";
 			endif;
-
-
-
-
 		}
-	
+		
+		// Add css for top nav WooCommerce mini cart
+		if ( isset( $woo_options['woo_mini_cart_location'] ) && ( 'top-nav' == $woo_options['woo_mini_cart_location'] ) ) {
+			$output .= '#top .cart-contents::before {font-family: \'FontAwesome\';display: inline-block;font-size: 100%;margin-right: .618em;font-weight: normal;line-height: 1em;width: 1em;content: "\f07a";}' ."\n";
+			$output .= '#top .cart{ margin-right:0px !important;}';
+		}
+
 		// Output the CSS to the woo_head function
 		if ( '' != $output ) {
 			echo "\n" . '<!-- Advanced Canvas CSS Styling -->' . "\n";
@@ -575,7 +609,18 @@ class Canvas_Advanced_Addons {
 								"id" => $shortname."_full_foot_bg",
 								"std" => "#316594",
 								"class" => 'hidden last',
-								"type" => "color");   
+								"type" => "color");
+
+			// Canvas WooCommerce Options
+			$options[] = array( 'name' => __( 'WooCommerce Settings', 'canvas-advanced-addons' ),
+								'type' => 'subheading' );
+
+			$options[] = array( 'name' => __( 'Mini Cart Location', 'canvas-advanced-addons' ),
+								'desc' => __( 'Location where the mini cart is displayed, by default this is in the main navigation.', 'canvas-advanced-addons' ),
+								'id' => $shortname . '_mini_cart_location',
+								'type' => 'select2',
+								'options' => array( 'main-nav' => __( 'Main Navigation', 'canvas-advanced-addons' ), 'top-nav' => __( 'Top Navigation', 'canvas-advanced-addons' ) ),
+								'std' => 'main-nav' );
 																									
 			return $options;
 		 
